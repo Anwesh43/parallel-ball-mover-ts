@@ -1,7 +1,7 @@
 const w : number = window.innerWidth 
 const h : number = window.innerHeight
 const parts : number = 3  
-const scGap : number = 0.02 
+const scGap : number = 0.02 / parts
 const strokeFactor : number = 90 
 const rFactor : number = 14.9 
 const delay : number = 20 
@@ -21,7 +21,7 @@ class ScaleUtil {
     }
 
     static divideScale(scale : number, i : number, n : number) : number {
-        return Math.min(1 / n, ScaleUtil.divideScale(scale, i, n)) * n 
+        return Math.min(1 / n, ScaleUtil.maxScale(scale, i, n)) * n 
     }
 
     static sinify(scale : number) : number {
@@ -41,12 +41,13 @@ class DrawingUtil {
         const sc1 : number = ScaleUtil.divideScale(scale, 0, parts)
         const sc2 : number = ScaleUtil.divideScale(scale, 1, parts)
         const sc3 : number = ScaleUtil.divideScale(scale, 2, parts)
+        console.log(sc1, sc2, sc3)
         const r : number = Math.min(w, h) / rFactor 
         DrawingUtil.drawCircle(context, w / 2, r + (h - 2 * r) * sc2, r * (sc1 - sc3))
         for (var j = 0; j < 2; j++) {
             const sf2 : number = ScaleUtil.sinify(sc2)
-            const x : number = -w / 2 + w * 0.5 * sf2
-            const y : number = -h / 2 + h * sc2 
+            const x : number = -w / 2 + r + (w  - 2 * r) * 0.5 * sf2
+            const y : number = -h / 2 + +r + (h - 2 * r) * sc2 
             context.save()
             context.translate(w / 2, h / 2)
             context.scale(1 - 2 * j, 1)
@@ -82,7 +83,9 @@ class Stage {
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.renderer.handleTap(() => {
+                this.render()
+            })
         }
     }
 
