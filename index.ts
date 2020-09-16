@@ -200,3 +200,25 @@ class ParallelBallMover {
         this.curr.startUpdating(cb)
     }
 }
+
+class Renderer {
+
+    pbm : ParallelBallMover = new ParallelBallMover()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.pbm.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.pbm.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.pbm.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
+    }
+}
